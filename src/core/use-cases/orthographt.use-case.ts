@@ -1,14 +1,34 @@
+import type { OrthograpyResponse } from "../../interfaces";
+
 export const orthographyUseCase = async( prompt: string ) => {
     try {
         
-    const resp = await fetch(`${ import.meta.env.VITE_GPT_API }/orthography-check`)
+    const resp = await fetch(`${ import.meta.env.VITE_GPT_API }/orthography-check`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ prompt })
+    });
+    
+    if( !resp.ok ) throw new Error('No se pudo realizar la corrección');
+
+    const respJson = resp.json();
+
+    const data = await respJson as OrthograpyResponse;
+    
+
+    return {
+        ok: true,
+        ...data
+    }
 
     } catch (error) {
         return {
             ok: false,
-            useScore: 0,
+            userScore: 0,
             errors: [],
-            message: 'No se puedo realizar la conexión'
+            message: 'No se puedo realizar la corrección'
         }
     }
 }
